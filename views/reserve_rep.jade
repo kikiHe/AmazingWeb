@@ -1,0 +1,38 @@
+extends layout/default
+
+block view
+    include page_partials/page_banner
+    section.ftco-section.contact-section#main
+        .container
+            .row.no-gutters.justify-content-center.mb-5.pb-5
+                .col-md-7.text-center.heading-section.ftco-animate
+                    h2 Reservation Info
+            .row.block-9.mb-4.justify-content-center
+                .col-md-4
+                    .col.mb-3.py-4.border
+                        p.mb-0
+                            span='Name: '
+                            span.text-primary=name
+                    .col.mb-3.py-4.border
+                        p.mb-0
+                            span='Email: '
+                            span.text-primary=email
+                    .col.mb-3.py-4.border
+                        p.mb-0
+                            span='Phone: '
+                            span.text-primary=phone
+                .col-md-4
+                    .col.mb-3.py-4.border
+                        p.mb-0
+                            span='Date: '
+                            span.text-primary=date
+                    .col.mb-3.py-4.border
+                        p.mb-0
+                            span='Time: '
+                            span.text-primary=time
+                    .col.mb-3.py-4.border
+                        p.mb-0
+                            span='Person: '
+                            span.text-primary=person
+            .row.mt-5
+                #map.col-md-12

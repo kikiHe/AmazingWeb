@@ -1,0 +1,56 @@
+extends layout/default
+block styles
+    style.
+        .ui-resizable-se {
+            right: 26px;
+            bottom: 1px
+        }
+
+block view
+    include page_partials/page_banner
+    section.ftco-section.contact-section#main
+        .container
+            .row.block-9.mb-4
+                .col-md-6
+                    h2.h4.mb-4 Contact Information
+                    .col.mb-3.py-4.border
+                        p.mb-0
+                            span='Address: '
+                            | 198 West 21th Street, Suite 721 New York NY 10016
+                    .col.mb-3.py-4.border
+                        p.mb-0
+                            span='Phone: '
+                            a(href='tel://1234567920') + 1235 2355 98
+                    .col.mb-3.py-4.border
+                        p.mb-0
+                            span='Email: '
+                            a(href='mailto:info@yoursite.com') info@yoursite.com
+                    .col.mb-3.py-4.border
+                        p.mb-0
+                            span='Website '
+                            a(href='#') yoursite.com
+                .col-md-6
+                    form(method='post', action='#')
+                        .form-group
+                            input.form-control(name='name', type='text', placeholder='Your Name')
+                        .form-group
+                            input.form-control(name='email', type='text', placeholder='Your Email')
+                        .form-group
+                            input.form-control(name='subject', type='text', placeholder='Subject')
+                        .form-group
+                            textarea.form-control(id='', name='message', rows='5', placeholder='Message')
+                        .form-group
+                            input.btn.btn-primary.py-3.px-5(type='submit', value='Send Message')
+            .row.mt-5
+                //#map.col-md-12
+
+block scripts
+    script.
+        $(function () {
+            $("textarea").resizable({
+                handles: "se",
+                autoHide: true,
+                minHeight: 50,
+                minWidth: 300
+            });
+        });

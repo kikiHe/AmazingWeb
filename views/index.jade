@@ -1,0 +1,97 @@
+extends layout/default
+
+block view
+    - var partial = true
+    include page_partials/banner
+    include page_partials/chef
+    include page_partials/menu
+    include page_partials/special
+    include page_partials/review
+    include page_partials/blog
+block autoScroll
+block scripts
+    script.
+        $('input[name=date]').datepicker({
+            dateFormat: 'mm/dd/yy',
+            showAnim: 'fadeIn'
+        });
+        $('input[name=time]').timepicker();
+        $(function () {
+            $.ajax({
+                url: '/menu',
+                type: 'post',
+                contentType: false,
+                processData: false,
+                success: function (data) {
+                    if (data.menu) {
+                        var menu_type = ['main', 'dessert', 'drink'];
+                        menu_type.forEach(function (type) {
+                            var meals = data.menu.filter(function (meal) {
+                                return meal.type === type;
+                            });
+                            var $left_menu = $('#menu-' + type + ' > .row > .left-menu');
+                            var $right_menu = $('#menu-' + type + ' > .row > .right-menu');
+                            var half_length = Math.ceil(meals.length / 2);
+                            var left_meals = meals.splice(0, half_length);
+                            left_meals.forEach(function (meal) {
+                                var ingredients_elements = '<span>' + meal.ingredients.join('</span>, <span>') + '</span>';
+                                var meal_element = $('<div class="menuDraggable"><div class="menus d-flex ftco-animate">' +
+                                    '<div class="menu-img" style="background-image: url(/images/' + meal.image_name + ')"></div>' +
+                                    '<div class="text d-flex"><div class="one-half"><h3>' + meal.name + '</h3>' +
+                                    '<p>' + ingredients_elements + '</p></div>' +
+                                    '<div class="one-forth"><span class="price">$' + meal.price + '</span></div></div></div></div>')
+                                    .appendTo($left_menu);
+                            });
+                            meals.forEach(function (meal) {
+                                var ingredients_elements = '<span>' + meal.ingredients.join('</span>, <span>') + '</span>';
+                                var meal_element = $('<div class="menuDraggable"><div class="menus d-flex ftco-animate">' +
+                                    '<div class="menu-img" style="background-image: url(/images/' + meal.image_name + ')"></div>' +
+                                    '<div class="text d-flex"><div class="one-half"><h3>' + meal.name + '</h3>' +
+                                    '<p>' + ingredients_elements + '</p></div>' +
+                                    '<div class="one-forth"><span class="price">$' + meal.price + '</span></div></div></div></div>')
+                                    .appendTo($right_menu);
+                            });
+                        });
+                        var i = 0;
+                        $('.menus.ftco-animate').waypoint(function (direction) {
+                            if (direction === 'down' && !$(this.element).hasClass('ftco-animated')) {
+                                i++;
+                                $(this.element).addClass('item-animate');
+                                setTimeout(function () {
+                                    $('.menus.ftco-animate.item-animate').each(function (k) {
+                                        var el = $(this);
+                                        setTimeout(function () {
+                                            el.addClass('fadeInUp ftco-animated').removeClass('item-animate');
+                                        }, k * 50, 'easeInOutExpo');
+                                    });
+                                }, 100);
+                            }
+                        }, {offset: '90%'});
+                        $(".connectedSortable").sortable({
+                            connectWith: ".connectedSortable",
+                            handle: '.menu-img',
+                            cancel: ".text",
+                            helper: 'clone',
+                            zIndex: 9999,
+                            cursor: 'pointer',
+                            opacity: 0.5,
+                            scrollSensitivity: 50,
+                            start: function (event, ui) {
+                                var $draggable = $('.connectedSortable .menuDraggable:hidden');
+                                $draggable.show().find('.menus').removeClass('ftco-animate ftco-animated');
+                            },
+                            update: function (event, ui) {
+                                setTimeout(function () {
+                                    $('.connectedSortable .menuDraggable .menus').each(function () {
+                                        var $this = $(this);
+                                        if (!$this.hasClass('ftco-animated')) {
+                                            $this.addClass('ftco-animated');
+                                        }
+                                    });
+                                }, 500);
+                            }
+                        });
+                    }
+                }
+            });
+        });

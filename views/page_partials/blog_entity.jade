@@ -1,0 +1,17 @@
+.row.div-change-theme
+    each item in blogs
+        .col-md-6.col-lg-3.ftco-animate
+            .blog-entry
+                a.block-20(href=item.link, style='background-image: url(/images/' + item.image + ');')
+                .text.p-4
+                    .meta
+                        div
+                            a(href=item.link)=item.date
+                        div
+                            a(href=item.link)=item.name
+                    h3.heading
+                        a(href=item.link)=item.title
+                    p.clearfix
+                        a.float-left.read(href=item.link) Read more
+                        a.float-right.meta-chat(href=item.link)
+                            span.icon-chat=item.comment

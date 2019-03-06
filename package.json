@@ -1,0 +1,29 @@
+{
+  "name": "cmpe280-amazingweb",
+  "version": "1.0.0",
+  "description": "For SJSU CMPE 226 Team3",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/ZhiyeChen/cmpe280-amazingweb.git"
+  },
+  "author": "@ZhiyeChen https://github.com/ZhiyeChen",
+  "license": "AFL-3.0",
+  "dependencies": {
+    "assert": "^1.4.1",
+    "body-parser": "^1.18.3",
+    "connect-redis": "^3.4.0",
+    "csvtojson": "^2.0.8",
+    "express": "^4.16.4",
+    "express-fileupload": "^1.0.0",
+    "express-session": "^1.15.6",
+    "jade": "^1.11.0",
+    "moment": "^2.22.2",
+    "mongodb": "^3.1.10",
+    "mysql": "^2.16.0",
+    "path": "^0.12.7",
+    "pug": "^2.0.3",
+    "range": "0.0.3",
+    "redis": "^2.8.0",
+    "redis-server": "^1.2.2"
+  }
+}

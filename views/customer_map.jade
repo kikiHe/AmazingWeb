@@ -1,0 +1,72 @@
+extends layout/clearout
+block styles
+    style(type='text/css').
+        .ui-resizable-handle.ui-resizable-s {
+            left: 50%;
+            height: 26px;
+            width: 26px;
+            margin: 5px;
+        }
+
+        .ui-resizable-handle.ui-resizable-s > i {
+            color: #646464;
+            font-size: 25px;
+        }
+block view
+    .container-fluid
+        .row
+            .col-12.connectedSortable
+                section.ftco-animate
+                    .row
+                        .box.reserve-chart.col-12
+                            .box-header.with-border
+                                h3.box-title SF Bay Area Customers
+                                .box-tools.pull-right
+                                    button.btn.btn-box-tool(type='button', data-widget='collapse')
+                                        i.fa.fa-minus
+                                    button.btn.btn-box-tool(type='button', data-widget='remove')
+                                        i.fa.fa-times
+                            .box-body.ftco-animate.fadeInUp.ftco-animated
+                                #viz1543988971741.tableauPlaceholder(style='position: relative;')
+                                    noscript
+                                        a(href='#')
+                                            img(alt=' ', src='https://public.tableau.com/static/images/Am/AmazingWeb/Sheet1/1_rss.png', style='border: none')
+                                    object.tableauViz(style='display:none;')
+                                        param(name='host_url', value='https%3A%2F%2Fpublic.tableau.com%2F')
+                                        param(name='embed_code_version', value='3')
+                                        param(name='site_root', value='')
+                                        param(name='name', value='AmazingWeb/Sheet1')
+                                        param(name='tabs', value='no')
+                                        param(name='toolbar', value='yes')
+                                        param(name='static_image', value='https://public.tableau.com/static/images/Am/AmazingWeb/Sheet1/1.png')
+                                        param(name='animate_transition', value='yes')
+                                        param(name='display_static_image', value='yes')
+                                        param(name='display_spinner', value='yes')
+                                        param(name='display_overlay', value='yes')
+                                        param(name='display_count', value='yes')
+                                        param(name='filter', value='publish=yes')
+block scripts
+    script(type='text/javascript').
+        var divElement = document.getElementById('viz1543988971741');
+        var vizElement = divElement.getElementsByTagName('object')[0];
+        vizElement.style.width = '100%';
+        vizElement.style.height = '100%';
+        vizElement.style.minHeight = '550px';
+        var scriptElement = document.createElement('script');
+        scriptElement.src = 'https://public.tableau.com/javascripts/api/viz_v1.js';
+        vizElement.parentNode.insertBefore(scriptElement, vizElement);
+        $("#viz1543988971741").resizable({
+            handles: 's',
+            minHeight: 550
+        });
+        $('.ui-resizable-handle.ui-resizable-s').append($('<i class="fa fa-arrow-down"></i>'));
+        $(document).on('mozfullscreenchange webkitfullscreenchange fullscreenchange', function () {
+            this.fullScreenMode = !this.fullScreenMode;
+            if (!this.fullScreenMode) {
+                $('#ftco-navbar').show();
+                $('.navbar-side').show();
+            } else {
+                $('#ftco-navbar').hide();
+                $('.navbar-side').hide();
+            }
+        });

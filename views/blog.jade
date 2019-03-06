@@ -1,0 +1,81 @@
+extends layout/default
+
+block view
+    include page_partials/page_banner
+    section.ftco-section.bg-light#main
+        #blog-tab.container.pt-5
+            ul.mb-4
+                li.py-3.px-4(aria-controls="bbq")
+                    a(href='/blog/bbq')
+                        span.flaticon-meat
+                        | Barbecue
+                li.py-3.px-4(aria-controls="noodle")
+                    a(href='/blog/noodle')
+                        span.flaticon-cutlery
+                        | Noodle
+            #bbq
+            #noodle
+            .row.mt-5
+                .col.text-center
+                    .block-27
+                        //- example
+                        ul
+                            li
+                                a(href='#') <
+                            li.active
+                                span 1
+                            li
+                                a(href='#') >
+            .row.justify-content-center.my-3
+                button(id='btn-change-theme' theme-mod='Theme 1' class='search-submit btn btn-primary')
+                    .text-white.bg-light
+                    | Theme light
+block scripts
+    script.
+        $('#blog-tab').tabs({
+            event: 'mouseover',
+            beforeLoad: function (event, ui) {
+                ui.panel.empty();
+                ui.jqXHR.done(function (data, textStatus, jqXHR) {
+                    console.log(textStatus);
+                }).fail(function (jqXHR, textStatus, errorThrown) {
+                    ui.panel.html('<p style="text-align: center;">Couldn\'t load this tab. We\'ll try to fix this as soon as possible.</p>');
+                });
+            },
+            load: function (event, ui) {
+                var i = 0;
+                $('#blog-tab .ftco-animate').waypoint(function (direction) {
+                    if (direction === 'down' && !$(this.element).hasClass('ftco-animated')) {
+                        i++;
+                        $(this.element).addClass('item-animate');
+                        setTimeout(function () {
+                            $('#blog-tab .ftco-animate.item-animate').each(function (k) {
+                                var el = $(this);
+                                setTimeout(function () {
+                                    el.addClass('fadeInUp ftco-animated').removeClass('item-animate');
+                                }, k * 50, 'easeInOutExpo');
+                            });
+                        }, 100);
+                    }
+                }, {offset: '90%'});
+            }
+        });
+        $('#btn-change-theme').click(function () {
+            if ($('#btn-change-theme').attr('theme-mod') === 'Theme 1') {
+                $('#btn-change-theme').attr('theme-mod', 'Theme 2');
+                $('#btn-change-theme').html('Theme dark');
+                $('#main, #blog-tab, #blog-tab > ul, #blog-tab .text').each(function () {
+                    $(this).addClass('bg-dark').removeClass('bg-light');
+                });
+                $('#blog-tab .text h3 a, #blog-tab .text p a, #blog-tab .block-27 a').addClass('text-primary');
+            }
+            else {
+                $('#btn-change-theme').attr('theme-mod', 'Theme 1');
+                $('#btn-change-theme').html('Theme light');
+                $('#main, #blog-tab, #blog-tab > ul, #blog-tab .text').each(function () {
+                    $(this).addClass('bg-light').removeClass('bg-dark');
+                });
+                $('#blog-tab .text h3 a, #blog-tab .text p a, #blog-tab .block-27 a').removeClass('text-primary');
+            }
+            window.scrollTo($('#main').offset());
+        });

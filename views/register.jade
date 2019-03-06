@@ -1,0 +1,105 @@
+extends layout/default
+
+block view
+    include page_partials/page_banner
+    section.ftco-section.bg-light#main
+        .container.reg-page.card
+            form#register(method='post', action='/register')
+                .row
+                    h4 Account
+                    .input-group.input-group-icon
+                        input(type="text", name='username', placeholder="Full Name", required)
+                        .input-icon
+                            i.fa.fa-user
+                    .input-group.input-group-icon
+                        input(type="email", name='email', placeholder="Email Address", required)
+                        .input-icon
+                            i.fa.fa-envelope
+                    .input-group.input-group-icon
+                        input(type="password", name='password', placeholder="Password", required)
+                        .input-icon
+                            i.fa.fa-key
+                .row
+                    .col-half
+                        h4 Date of Birth
+                        .input-group.input-group-icon
+                            input#birthday(type="text", name='birthday', placeholder="MM/DD/YYYY", required)
+                            .input-icon
+                                i.fa.fa-calendar
+                    .col-half
+                        h4 Gender
+                        .input-group
+                            input(type="radio", name="gender", value="male", id="gender-male", checked="true")
+                            label(for="gender-male") Male
+                            input(type="radio", name="gender", value="female", id="gender-female")
+                            label(for="gender-female") Female
+                .row
+                    h4 Payment Details
+                    .input-group
+                        input(type="radio", name="payment", value="card", id="payment-card", checked="true")
+                        label(for="payment-card")
+                            span
+                                i.fa.fa-cc-visa
+                                | Credit Card
+                        input(type="radio", name="payment", value="paypal", id="payment-paypal")
+                        label(for="payment-paypal")
+                            span
+                                i.fa.fa-cc-paypal
+                                | Paypal
+                .row.visa-group
+                    .input-group.input-group-icon
+                        input#card(type="text", name='card', pattern='[0-9]{16}', placeholder="Card Number", required)
+                        .input-icon
+                            i.fa.fa-credit-card
+                    .col-half
+                        .input-group.input-group-icon
+                            input#cvc(type="text", name='cvc', pattern='[0-9]{3}', placeholder="Card CVC", required)
+                            .input-icon
+                                i.fa.fa-user
+                    .col-half
+                        .input-group
+                            select#card_mon(name='card_mon', required)
+                                each mon in range(1,13)
+                                    option=('00' + mon).slice(-2)
+                            select#card_year(name='card_year', required)
+                                each y in range(0,50)
+                                    option=moment().add(y, 'year').format('YYYY')
+                .row
+                    h4 Terms and Conditions
+                    .form-group
+                        .form-check
+                            input.form-check-input#terms(type="checkbox", name='terms', required)
+                            label.form-check-label(for='terms')
+                            | I accept the terms and conditions for signing up to this service, and hereby confirm I have read the privacy policy.
+                .row.justify-content-center.text-center
+                    .col-md-6
+                        .form-group
+                            input.btn.btn-primary.py-3.px-5(type='submit', value='Submit')
+block scripts
+    script.
+        $('input[type=radio][name=payment]').change(function () {
+            if (this.value === 'card') {
+                $('.visa-group').fadeIn();
+                $('#card').attr('required', true);
+                $('#cvc').attr('required', true);
+                $('#card_mon').attr('required', true);
+                $('#card_year').attr('required', true);
+            }
+            else if (this.value === 'paypal') {
+                $('.visa-group').fadeOut();
+                $('#card').val('').removeAttr('required')
+                $('#cvc').val('').removeAttr('required')
+                $('#card_mon').removeAttr('required')
+                $('#card_year').removeAttr('required')
+            }
+        });
+        $('#birthday').datepicker({
+            format: 'mm/dd/yyyy',
+            autoclose: true
+        });
+        $('#register').submit(function (e) {
+            if ($('#terms').prop('checked') && $('#birthday').val().match(/\d{2}\/\d{2}\/\d{4}/g)) {
+                return;
+            }
+            e.preventDefault();
+        });

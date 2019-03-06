@@ -1,0 +1,138 @@
+extends layout/default
+
+mixin nested_comment(comments)
+    each comment in comments
+        li.comment
+            .vcard.bio
+                img(src=comment.image, alt='Image placeholder')
+            .comment-body
+                h3=comment.name
+                .meta=comment.date
+                p=comment.content
+                p
+                    a.reply(href='#') Reply
+            if comment.reply.length !== 0
+                ul.children
+                    +nested_comment(comment.reply)
+block view
+    include page_partials/page_banner
+    section.ftco-section#main
+        .container
+            .row
+                .col-md-8.ftco-animate#blog-accordion
+                    h2.mb-3 A Short Trip To Paris
+                    div.accordin-content
+                        p
+                            | As a kid, I had dreamt of visiting the world, seeing new places and understanding their way of living, creating memories and making new friends as I go along. Never knew it would actually come true at some point of my life. I feel extremely blessed when I think of the different places I have visited so far and I hope the journey continues life long, cause I am always hungry for more!
+                        p
+                            img.img-fluid(src='/images/image_6.jpg', alt='')
+                        p
+                            | I finally finished editing some of the pictures and thought it’s time to share it with you. There are way too many photos and I think that we husband and wife should learn to take fewer photographs. Every single building looked so gorgeous, every single corner looked so pretty that we just couldn’t stop ourselves. If not for the cold and rain, we might have landed up snapping much more than we did. I have to say, beauty such as this can’t really be captured in frames. However, it helps to re-live the moment.
+                    h2.mb-3.mt-5 A Weekend In Portland
+                    div.accordin-content
+                        p
+                            | The beautiful city of Portland has many nicknames. It’s called the City of Roses, Bridgetown, Stumptown, Rip City and Soccer City USA. I think the perfect nickname for this beautiful place should be ‘Green Land’.
+                        p
+                            img.img-fluid(src='/images/image_8.jpg', alt='')
+                        p
+                            | The first thing we noticed on reaching Portland was the abundance of green — beautiful green fields and huge green trees covering the entire city. One would love to get lost in them and we did that for next 2 days! There was a beautiful casual environment, fresh air, much less pollution and not very commercial. Coming from sunny California, it felt a little chilly in the morning but by the afternoon, it became pleasantly warm. With just two days in hand, we didn’t get enough time to see a lot but we were happy with whatever we covered.
+                        p
+                            | This post is overloaded with photos and I blame this beautiful place where anybody who loves to takes pictures can find a zillion things to capture.
+                        p
+                            | Sauvie Island in Portland – This is where we spent out first day. The plan was to hike, bike and go kayaking. However, we spent the whole day just enjoying the scenic beauty and walking on the beach.
+                        p
+                            | Voodoo Doughnuts – You cannot leave Portland without eating these doughnuts. Check out the queue! We had to wait for about 30 minutes, got drenched in rain but at the end, it was totally worth the effort. These are the best doughnuts we ever tasted. Damn! I am missing it now.
+                    .tag-widget.post-tag-container.mb-5.mt-5
+                        .tagcloud
+                            a.tag-cloud-link(href='#') Life
+                            a.tag-cloud-link(href='#') Sport
+                            a.tag-cloud-link(href='#') Tech
+                            a.tag-cloud-link(href='#') Travel
+                    .about-author.d-flex.p-5.bg-light
+                        .bio.align-self-md-center.mr-5
+                            img.img-fluid.mb-4(src='/images/person_1.jpg', alt='Image placeholder')
+                        .desc.align-self-md-center
+                            h3 Lance Smith
+                            p
+                                | Lorem ipsum dolor sit amet, consectetur adipisicing elit. Ducimus itaque, autem necessitatibus voluptate quod mollitia delectus aut, sunt placeat nam vero culpa sapiente consectetur similique, inventore eos fugit cupiditate numquam!
+                    .pt-5.mt-5
+                        h3.mb-5 6 Comments
+                        ul.comment-list
+                            +nested_comment(inits.blog_comment)
+                        //- END comment-list
+                        .comment-form-wrap.pt-5
+                            h3.mb-5 Leave a comment
+                            form.p-5.bg-light(action='#')
+                                .form-group
+                                    label(for='name') Name *
+                                    input#name.form-control(type='text')
+                                .form-group
+                                    label(for='email') Email *
+                                    input#email.form-control(type='email')
+                                .form-group
+                                    label(for='website') Website
+                                    input#website.form-control(type='url')
+                                .form-group
+                                    label(for='message') Message
+                                    textarea#message.form-control(name='', cols='30', rows='10')
+                                .form-group
+                                    input.btn.py-3.px-4.btn-primary(type='submit', value='Post Comment')
+                //- .col-md-8
+                .col-md-4.sidebar
+                    .sidebar-box
+                        form.search-form(action='#')
+                            .form-group
+                                span.icon.fa.fa-search
+                                input.form-control(type='text', placeholder='Type a keyword and hit enter')
+                    .sidebar-box.ftco-animate
+                        .categories
+                            h3 Categories
+                            li
+                                a(href='#')
+                                    | Food
+                                    span (12)
+                            li
+                                a(href='#')
+                                    | Dish
+                                    span (22)
+                            li
+                                a(href='#')
+                                    | Desserts
+                                    span (37)
+                            li
+                                a(href='#')
+                                    | Drinks
+                                    span (42)
+                            li
+                                a(href='#')
+                                    | Ocassion
+                                    span (14)
+                    .sidebar-box.ftco-animate
+                        h3 Tag Cloud
+                        .tagcloud
+                            a.tag-cloud-link(href='#') dish
+                            a.tag-cloud-link(href='#') menu
+                            a.tag-cloud-link(href='#') food
+                            a.tag-cloud-link(href='#') sweet
+                            a.tag-cloud-link(href='#') tasty
+                            a.tag-cloud-link(href='#') delicious
+                            a.tag-cloud-link(href='#') desserts
+                            a.tag-cloud-link(href='#') drinks
+                    .sidebar-box.ftco-animate
+                        h3 Paragraph
+                        p
+                            | Lorem ipsum dolor sit amet, consectetur adipisicing elit. Ducimus itaque, autem necessitatibus voluptate quod mollitia delectus aut, sunt placeat nam vero culpa sapiente consectetur similique, inventore eos fugit cupiditate numquam!
+                //- .col-md-4
+    //- .section
+block scripts
+    script.
+        $('#blog-accordion').accordion({
+            header: '> h2',
+            heightStyle: "content",
+            event: "mouseover",
+            activate: function (event, ui) {
+                $('html, body').animate({
+                    scrollTop: (ui.newHeader.offset().top - $('#ftco-navbar').outerHeight())
+                }, 300, 'easeOutBack');
+            }
+        });

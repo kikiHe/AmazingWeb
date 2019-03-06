@@ -1,0 +1,169 @@
+extends layout/default
+
+block view
+    include page_partials/page_banner
+    include page_partials/menu
+    aside.ui-widget-content.ui-state-default.menu-cart.menuDroppable
+        h4.ui-widget-header
+            span.ui-icon.ui-icon-cart Cart
+            | Cart
+
+block scripts
+    script.
+        $(function () {
+            $.ajax({
+                url: '/menu',
+                type: 'post',
+                contentType: false,
+                processData: false,
+                success: function (data) {
+                    if (data.menu) {
+                        var menu_type = ['main', 'dessert', 'drink'];
+                        menu_type.forEach(function (type) {
+                            var meals = data.menu.filter(function (meal) {
+                                return meal.type === type;
+                            });
+                            var $left_menu = $('#menu-' + type + ' > .row > .left-menu');
+                            var $right_menu = $('#menu-' + type + ' > .row > .right-menu');
+                            var half_length = Math.ceil(meals.length / 2);
+                            var left_meals = meals.splice(0, half_length);
+                            left_meals.forEach(function (meal) {
+                                var ingredients_elements = '<span>' + meal.ingredients.join('</span>, <span>') + '</span>';
+                                var meal_element = $('<div class="menuDraggable"><div class="menus d-flex ftco-animate">' +
+                                    '<div class="menu-img" style="background-image: url(/images/' + meal.image_name + ')"></div>' +
+                                    '<div class="text d-flex"><div class="one-half"><h3>' + meal.name + '</h3>' +
+                                    '<p>' + ingredients_elements + '</p></div>' +
+                                    '<div class="one-forth"><span class="price">$' + meal.price + '</span></div></div></div></div>')
+                                    .appendTo($left_menu);
+                            });
+                            meals.forEach(function (meal) {
+                                var ingredients_elements = '<span>' + meal.ingredients.join('</span>, <span>') + '</span>';
+                                var meal_element = $('<div class="menuDraggable"><div class="menus d-flex ftco-animate">' +
+                                    '<div class="menu-img" style="background-image: url(/images/' + meal.image_name + ')"></div>' +
+                                    '<div class="text d-flex"><div class="one-half"><h3>' + meal.name + '</h3>' +
+                                    '<p>' + ingredients_elements + '</p></div>' +
+                                    '<div class="one-forth"><span class="price">$' + meal.price + '</span></div></div></div></div>')
+                                    .appendTo($right_menu);
+                            });
+                        });
+                        var i = 0;
+                        $('.menus.ftco-animate').waypoint(function (direction) {
+                            if (direction === 'down' && !$(this.element).hasClass('ftco-animated')) {
+                                i++;
+                                $(this.element).addClass('item-animate');
+                                setTimeout(function () {
+                                    $('.menus.ftco-animate.item-animate').each(function (k) {
+                                        var el = $(this);
+                                        setTimeout(function () {
+                                            el.addClass('fadeInUp ftco-animated').removeClass('item-animate');
+                                        }, k * 50, 'easeInOutExpo');
+                                    });
+                                }, 100);
+                            }
+                        }, {offset: '90%'});
+                        $(".menuDraggable").draggable({
+                            opacity: .6,
+                            revert: 'invalid',
+                            revertDuration: 100,
+                            cursor: 'pointer',
+                            cursorAt: {top: 10, left: 10},
+                            appendTo: "#main",
+                            scroll: false,
+                            zIndex: 9999,
+                            helper: function () {
+                                return $("<div class='helper-img menuDraggable'></div>").append($(this).find('.menu-img').clone());
+                            },
+                            drag: function (event, ui) {
+                                ui.helper.animateCss('jello');
+                            }
+                        }).disableSelection();
+                    }
+                }
+            })
+        });
+        $('.menuDroppable').droppable({
+            accept: '.menuDraggable',
+            tolerance: 'touch',
+            zIndex: 9998,
+            activeClass: "ui-droppable-hover",
+            drop: function (event, ui) {
+                var $cart = $('.menu-cart').addClass('cart-active');
+                var $items = $('.cart-img', $cart);
+                var index = $items.length ? parseInt($items.last().attr('id').split('_')[2]) + 1 : 0;
+                var $new = $("<div id='cart_item_" + index + "' class='cart-img placed'></div>").append(ui.draggable.find('.menu-img').clone());
+                var $list = $('ul', $cart).length ? $('ul', $cart) : $("<ul class='ui-helper-reset'></ul>").appendTo($cart);
+                $list.append($new);
+                $list.find('#cart_item_' + index).animateCss('rubberBand').draggable({
+                    revert: false,
+                    revertDuration: 100,
+                    cursor: 'pointer',
+                    zIndex: 9999,
+                    start: function (event, ui) {
+                        ui.helper.removeClass('placed');
+                    },
+                    stop: function (event, ui) {
+                        ui.helper.addClass('placed');
+                        var rect1 = $cart[0].getBoundingClientRect(),
+                            rect2 = event.target.getBoundingClientRect();
+                        if (rect1.right < rect2.left ||
+                            rect1.left > rect2.right ||
+                            rect1.bottom < rect2.top ||
+                            rect1.top > rect2.bottom) {
+                            ui.helper.animateCss('bounceOut', function () {
+                                ui.helper.remove();
+                                if ($('.cart-img', $cart).length == 0) {
+                                    $cart.removeClass('cart-active');
+                                }
+                            });
+                        } else {
+                            ui.helper.css('left', 0);
+                            ui.helper.css('top', 0);
+                        }
+                    }
+                }).click(function () {
+                    var $this = $(this);
+                    if ($this.hasClass('clicked')) {
+                        $this.animateCss('bounceOut', function () {
+                            $this.remove();
+                            if ($('.cart-img', $cart).length == 0) {
+                                $cart.removeClass('cart-active');
+                            }
+                        });
+                    } else {
+                        $this.addClass('clicked');
+                    }
+                }).mouseleave(function () {
+                    $(this).removeClass('clicked');
+                });
+            }
+        });
+        var isrunning = false;
+        $('.menu-cart').animateCss('fadeInUpCart').mousemove(function (event) {
+            var
+                $cart = $(this),
+                winHeight = $(window).height(),
+                elHeight = $cart.height(),
+                scroll = 0,
+                tolerance = .6,
+                mRangeTop = winHeight * (.5 - tolerance / 2),
+                mRangeBottom = winHeight * (.5 + tolerance / 2),
+                cRangeTopMin = mRangeBottom - elHeight,
+                cRangeTopMax = mRangeTop,
+                raf = window.requestAnimationFrame ||
+                    window.webkitRequestAnimationFrame ||
+                    window.msRequestAnimationFrame ||
+                    window.mozRequestAnimationFrame ||
+                    window.oRequestAnimationFrame;
+
+            if (mRangeTop <= event.clientY && event.clientY <= mRangeBottom) {
+                isrunning = true;
+                scroll = (event.clientY - mRangeTop) / (winHeight * tolerance);
+                raf(function animation() {
+                    var curTop = cRangeTopMin + (cRangeTopMax - cRangeTopMin) * (scroll >= 0 ? 1 - scroll : 1);
+                    $cart.css({top: curTop});
+                    if (isrunning) raf(animation);
+                });
+            }
+        }).mouseleave(function () {
+            isrunning = false;
+        });

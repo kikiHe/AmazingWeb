@@ -1,0 +1,32 @@
+image_name,ingredients.0,ingredients.1,ingredients.2,ingredients.3,ingredients.4,name,price,special,type
+dish-1.jpg,Assorted Salad with Beetroot,Emmental Cheese,Grilled Bacon & Egg,,,LA GRENOBLOISE,39,1,main
+drink-1.jpg,Tequila,Orange Juice,Grenadine & Crushed Ice,,,TEQUILA SUNRISE,19,1,drink
+dessert-1.jpg,Ice-cream,,,,,MACARON ICE-CREAM,19,1,dessert
+dish-2.jpg,Smoked Salmon,Aneth,Cheese Cream,Tomatoes,Bread,LE NORDIQUE,35,0,main
+dish-3.jpg,Natural Reduction Sause,Fried California Cauliflower & Almonds,Chef Selected Farmers Market Vegetables,Braised Lamb Shank,,BRAISED LAMB SHANK,39,1,main
+dish-4.jpg,ribs,,,,,LE RIBS,30,0,main
+dish-5.jpg,ribs,,,,,LE SHRIMPS,35,0,main
+dish-6.jpg,Golden oven-baked chicken leg,Mushrooms,Creamy sauce,,,à la crème,33,0,main
+dish-7.jpg,Barbecue Sauce,"Chicken, Emmental Cheese & Olive",Bread,,,LE BARBECUE,37,0,main
+dish-8.jpg,Smoked Shrimp,"Aneth, Cheese Cream & Tomatoes",,,,LE NORDIQUE,37,0,main
+dish-9.jpg,Assorted Salad with Tomato,Cucumber,Smoked Salmon & Lemon-Butter,,,L’ATLANTIQUE,35,0,main
+dessert-2.jpg,fresh strawberries,cream,,,,PAVLOVA,19,0,dessert
+dessert-3.jpg,Respberries,Ice-cream,,,,RESPBERRIES & MERINGUE ICE-CREAM SUNDAE,19,0,dessert
+dessert-5.jpg,Fresh fruits,Pie,,,,FRUIT PIE,19,0,dessert
+dessert-5.jpg,Blueberries,Pie,,,,BLUEBERRY PIE,19,0,dessert
+dessert-6.jpg,Fruit cocktail,Ice-cream,Strawberry sause,,,BANANA BOAT,19,0,dessert
+dessert-7.jpg,Strawberries,Pancakes,,,,STRAWBERRY PANCAKE,19,0,dessert
+dessert-8.jpg,Cream,Puffs,,,,CREAM PUFFS,18,0,dessert
+dessert-9.jpg,Chocolate,Brownie,,,,WARM CHOCOLATE BROWNIE,17,0,dessert
+dessert-10.jpg,Respberries,Pancakes,,,,RESPBERRY PANCAKE,18,0,dessert
+drink-2.jpg,Red wine,,,,,RED WINE,15,0,drink
+drink-3.jpg,White rum,Lime juice,Strawberry puree,Fresh mint leaves,Crushed ice,STRAWBERRY MOJITO,19,0,drink
+drink-4.jpg,Bear,,,,,BEAR,10,0,drink
+drink-6.jpg,Martini,Mickey Finn's & apple juice,,,,APPLETINI,17,0,drink
+drink-6.jpg,Vodka,Mickey Finn's topped with apple & strawberry juice,,,,APPLE BLOSSOM,18,0,drink
+drink-7.jpg,Gin,Triple Sec & tonic,Mint leaves,Cucumber & orange,,GT & T,17,0,drink
+drink-8.jpg,Vodka,,,,,BLOODY MARY,17,0,drink
+drink-9.jpg,Malibu & white rum,Pineapple juice,Fresh cream,Pineapple garnish,,PINA COLADA,19,0,drink
+drink-10.jpg,Vodka,Crushed ice,,,,BLACK RUSSIAN,15,0,drink
+drink-11.jpg,Prosecco,Strawberry puree,Creme de Cassis,,,STRAWBERRY PROSECCO,19,0,drink
+drink-12.jpg,White rum,Dash of Prosecco,Fresh mint,Lime,Crushed ice,CHAMPAGNE MOJITO,19,1,drink

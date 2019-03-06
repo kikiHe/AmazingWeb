@@ -1,0 +1,56 @@
+extends layout/default
+
+block view
+    include page_partials/page_banner
+    section.ftco-section#main
+        .container
+            .row.no-gutters.justify-content-center.mb-5.pb-5
+                .col-md-7.text-center.heading-section.ftco-animate
+                    h2 Make a Reservation
+            .row.d-flex
+                .col-md-4.ftco-animate.img(style='background-image: url(/images/bg_1.jpg);')
+                .col-md-8.ftco-animate.makereservation.p-5.bg-light
+                    form#reserve(action='/reserve', method='post')
+                        .row
+                            .col-md-6
+                                .form-group
+                                    label Name
+                                    input.form-control(type='text', name='name', placeholder='Your Name', required)
+                            .col-md-6
+                                .form-group
+                                    label Email
+                                    input.form-control(type='email', name='email', placeholder='Your Email')
+                            .col-md-6
+                                .form-group
+                                    label Phone
+                                    input.form-control(type='text', name='phone', placeholder='Phone', required)
+                            .col-md-6
+                                .form-group
+                                    label Date
+                                    input.form-control(type='text', name='date', placeholder='Date', required)
+                            .col-md-6
+                                .form-group
+                                    label Time
+                                    input#book_time.form-control(type='text', name='time', placeholder='Time', required)
+                            .col-md-6
+                                .form-group
+                                    label Person
+                                    .select-wrap.one-third
+                                        .icon
+                                            span.ion-ios-arrow-down
+                                        select.form-control(name='person', required)
+                                            option(value='1') 1
+                                            option(value='2') 2
+                                            option(value='3') 3
+                                            option(value='n') 4+
+                            .col-md-12.mt-3
+                                .form-group
+                                    input.btn.btn-primary.py-3.px-5(type='submit', value='Make a Reservation')
+
+block scripts
+    script.
+        $('input[name=date]').datepicker({
+            dateFormat: 'mm/dd/yy',
+            showAnim: 'fadeIn'
+        });
+        $('input[name=time]').timepicker();

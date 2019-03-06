@@ -1,0 +1,43 @@
+mixin addSideBar(i)
+    li
+        a
+            i.fa(class=i aria-hidden="true")
+            |  TBD
+        .triangle-box.d-flex.flex-row-reverse
+            span
+
+nav.navbar-side.ftco-animate
+    .sidebar-collapse
+        ul.nav
+            li
+                a(href='/dashboard', class=((sidenav === 'overview') && 'active') || '')
+                    i.fa.fa-dashboard(aria-hidden="true")
+                    |  Overview
+                .triangle-box.d-flex.flex-row-reverse
+                    span
+            li
+                a(href='/popular_flavors', class=((sidenav === 'popular_flavors') && 'active') || '')
+                    i.fa.fa-bar-chart(aria-hidden="true")
+                    |  Popular Flavors
+                .triangle-box.d-flex.flex-row-reverse
+                    span
+            li
+                a(href='/dishes_times', class=((sidenav === 'dishes_times') && 'active') || '')
+                    i.fa.fa-line-chart(aria-hidden="true")
+                    |  Dish Statistic
+                .triangle-box.d-flex.flex-row-reverse
+                    span
+            li
+                a(href='/customer_map', class=((sidenav === 'customer_map') && 'active') || '')
+                    i.fa.fa-map(aria-hidden="true")
+                    |  Customer Map
+                .triangle-box.d-flex.flex-row-reverse
+                    span
+            li
+                a(href='/manage', class=((sidenav === 'manage') && 'active') || '')
+                    i.fa.fa-users(aria-hidden="true")
+                    |  User Manage
+                .triangle-box.d-flex.flex-row-reverse
+                    span
+            each i in ['fa-line-chart', 'fa-pie-chart', 'fa-area-chart', 'fa-bar-chart', 'fa-cog', 'fa-cogs', 'fa-sitemap', 'fa-object-group', 'fa-tasks']
+                +addSideBar(i)

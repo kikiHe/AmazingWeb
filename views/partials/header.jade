@@ -1,0 +1,33 @@
+.container
+    a(href='/')
+        canvas#logobrand(width='148', height='26')
+            .navbar-brand AmazingWeb
+button.navbar-toggler(type='button', data-toggle='collapse', data-target='#ftco-nav', aria-controls='ftco-nav', aria-expanded='false', aria-label='Toggle navigation')
+    span.oi.oi-menu Menu
+#ftco-nav.collapse.navbar-collapse
+    ul.navbar-nav.ml-auto
+        li.nav-item(class=((nav === 'home') && 'active') || '')
+            a.nav-link(href='/') Home
+        li.nav-item(class=((nav === 'menu') && 'active') || '')
+            a.nav-link(href='/menu') Menu
+        li.nav-item(class=((nav === 'special') && 'active') || '')
+            a.nav-link(href='/specialties') Specialties
+        li.nav-item(class=((nav === 'reserve') && 'active') || '')
+            a.nav-link(href='/reserve') Reservation
+        li.nav-item(class=((nav === 'blog') && 'active') || '')
+            a.nav-link(href='/blog') Blog
+        li.nav-item(class=((nav === 'about') && 'active') || '')
+            a.nav-link(href='/about') About
+        li.nav-item(class=((nav === 'contact') && 'active') || '')
+            a.nav-link(href='/contact') Contact
+        if name && role
+            li.nav-item
+                a.nav-link(href='') Profile
+            if role == 'admin'
+                li.nav-item(class=((nav === 'dashboard') && 'active') || '')
+                    a.nav-link(href='/Dashboard') Dashboard
+            li.nav-item
+                a.nav-link(href='/logout') Logout
+        else
+            li.nav-item
+                a.nav-link(href='', tabindex='-1', data-toggle='modal' data-target='#loginModal') Login

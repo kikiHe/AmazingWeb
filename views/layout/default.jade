@@ -1,0 +1,22 @@
+doctype html
+html(lang='en')
+    head
+        include ../partials/head
+        block styles
+    body
+        nav.navbar.navbar-expand-lg.navbar-dark.bg-dark.ftco-navbar-light(id='ftco-navbar', class=(error ? 'scrolled awake' : 'ftco_navbar'))
+            include ../partials/header
+        block view
+        unless error
+            include ../page_partials/social
+        include ../partials/footer
+        if !name && !role
+            include ../page_partials/login
+        include ../partials/scripts
+        block autoScroll
+            script.
+                window.scrollTo($('#main').offset());
+        block scripts
+        if message
+            script.
+                $.notify('#{message}');

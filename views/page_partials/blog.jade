@@ -1,0 +1,25 @@
+section.ftco-section.bg-light
+    .container
+        .row.justify-content-center.mb-5.pb-5
+            .col-md-7.text-center.heading-section.ftco-animate
+                span.subheading Blog
+                h2 Recent Blog
+        .row.ftco-animate
+            .carousel1.owl-carousel.ftco-owl
+                each item, i in inits.blog
+                    if i >= inits.blog.length / 2
+                        .item
+                            .blog-entry
+                                a.block-20(href='/blog/bbq/1', style='background-image: url(' + item.image + ');')
+                                .text.p-4
+                                    .meta
+                                        div
+                                            a(href='/blog/bbq/1')=item.date
+                                        div
+                                            a(href='/blog/bbq/1')=item.name
+                                    h3.heading
+                                        a(href='/blog/bbq/1')=item.title
+                                    p.clearfix
+                                        a.float-left.read(href='/blog/bbq/1') Read more
+                                        a.float-right.meta-chat(href='/blog/bbq/1')
+                                            span.icon-chat=item.comment

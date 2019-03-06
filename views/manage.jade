@@ -1,0 +1,211 @@
+extends layout/clearout
+
+block view
+    section.ftco-section.py-5.animated.fadeInUp
+        .container.card.table-card
+            table.hover.order-column.row-border#usertable
+                thead
+                    tr
+                        each col in cols
+                            th=col
+                tbody
+                    //- for once querying page only
+                    //- each row in rows
+                    //-     tr(id=row['_id'])
+                    //-        each col in cols
+                    //-             td=row[col]
+                tfoot
+                    tr
+                        each col in cols
+                            th=col
+    #editModal.modal.fade(tabindex='-1', role='dialog', aria-hidden='true')
+        .modal-dialog.modal-dialog-centered.modal-lg(role='document')
+            .modal-content
+                .modal-header.border-0.position-fixed(style='z-index:1')
+                    button.close(type='button', data-dismiss='modal', aria-label='Close')
+                        span(aria-hidden='true') ×
+                .modal-body.p-0
+                    .container.reg-page
+                        form#editform(method='post', action='/manage/update')
+                            .row
+                                input.d-none#user_id(type="text", name='user_id')
+                                .input-group.input-group-icon
+                                    input#username(type="text", name='username', placeholder="Full Name", required)
+                                    .input-icon
+                                        i.fa.fa-user
+                                .input-group.input-group-icon
+                                    input#email(type="email", name='email', placeholder="Email Address", required)
+                                    .input-icon
+                                        i.fa.fa-envelope
+                                .input-group.input-group-icon
+                                    input#password(type="password", name='password', placeholder="Password", required)
+                                    .input-icon
+                                        i.fa.fa-key
+                            .row
+                                .col-half
+                                    .input-group.input-group-icon
+                                        input#birthday(type="text", name='birthday', placeholder="MM/DD/YYYY", required)
+                                        .input-icon
+                                            i.fa.fa-calendar
+                                .col-half
+                                    .input-group
+                                        input(type="radio", name="gender", value="male", id="gender-male", checked="true")
+                                        label(for="gender-male") Male
+                                        input(type="radio", name="gender", value="female", id="gender-female")
+                                        label(for="gender-female") Female
+                            .row
+                                .col-half.col-60
+                                    .input-group
+                                        input(type="radio", name="role", value="user", id="role-user", checked="true")
+                                        label.col-third(for="role-user") User
+                                        input(type="radio", name="role", value="merchant", id="role-merchant")
+                                        label.col-third(for="role-merchant") Merchant
+                                        input(type="radio", name="role", value="admin", id="role-admin")
+                                        label.col-third(for="role-admin") Admin
+                                .col-half.col-40
+                                    input.btn.btn-primary.py-3.px-5(type='submit', value='Submit')
+
+block scripts
+    script.
+        $(function () {
+            var table = $('#usertable').DataTable({
+                processing: true, serverSide: true,
+                ajax: {url: '/manage', type: 'post'},
+                columns: [
+                    {data: 'username', name: 'username'},
+                    {data: 'password', name: 'password'},
+                    {data: 'email', name: 'email'},
+                    {data: 'birthday', name: 'birthday'},
+                    {data: 'gender', name: 'gender'},
+                    {data: 'role', name: 'role'}
+                ],
+                stateSave: true,
+                lengthMenu: [[5, 10, 25, -1], [5, 10, 25, "All"]],
+                fixedHeader: {header: true, headerOffset: 72, footer: true},
+                select: 'single',
+                dom: '<"fg-toolbar ui-toolbar ui-widget-header ui-helper-clearfix ui-corner-tl ui-corner-tr"lBfr>' + 't' +
+                    '<"fg-toolbar ui-toolbar ui-widget-header ui-helper-clearfix ui-corner-bl ui-corner-br"ip>',
+                buttons: {
+                    buttons: [{
+                        text: 'Add',
+                        action: function (e, dt) {
+                            dt.rows().deselect();
+                            $('#editform')[0].reset();
+                            $('#editModal').modal('show');
+                        }
+                    }, {
+                        extend: 'selectedSingle',
+                        text: 'Edit',
+                        action: function () {
+                            $('#editModal').modal('show');
+                        }
+                    }, {
+                        extend: 'selectedSingle',
+                        text: 'Delete',
+                        action: function (e, dt) {
+                            if ($('#user_id').val().length !== 0) {
+                                var formData = new FormData($('#editform')[0]);
+                                $.ajax({
+                                    type: "delete",
+                                    url: "/manage",
+                                    data: formData,
+                                    contentType: false,
+                                    processData: false,
+                                    success: function (data) {
+                                        if (data.redirect) window.location.href = data.redirect;
+                                        else if (data.record) {
+                                            // only draw() needed for server-side data table
+                                            var row = dt.row('#' + data.record.user_id);
+                                            if (row.length !== 0) {
+                                                row.remove().draw(false);
+                                                $.notify('Successfully Deleted');
+                                            }
+                                        }
+                                    }
+                                });
+                            }
+                        }
+                    }, 'colvis', 'colvisRestore']
+                }
+            });
+            table.on('select', function (e, dt, type, indexes) {
+                var rowData = table.rows(indexes).data().toArray()[0];
+                if (rowData) {
+                    $('#user_id').val(rowData.DT_RowId ? rowData.DT_RowId : '');
+                    $('#username').val(rowData.username ? rowData.username : '');
+                    $('#password').val(rowData.password ? rowData.password : '');
+                    $('#email').val(rowData.email ? rowData.email : '');
+                    $('#birthday').val(rowData.birthday ? rowData.birthday : '');
+                    if (rowData.gender) {
+                        var $radios = $('input:radio[name=gender]');
+                        $radios.filter('[value=' + rowData.gender + ']').prop('checked', true);
+                    }
+                    if (rowData.role) {
+                        var $radios = $('input:radio[name=role]');
+                        $radios.filter('[value=' + rowData.role + ']').prop('checked', true);
+                    }
+                }
+            });
+            $('#birthday').datepicker({
+                format: 'mm/dd/yyyy',
+                autoclose: true
+            });
+            $('#editform').keypress(function (event) {
+                if (event.keyCode === 10 || event.keyCode === 13)
+                    event.preventDefault();
+            }).submit(function (e) {
+                e.preventDefault();
+                $.notify('Please wait...');
+                $('#editModal').modal('hide');
+                var formData = new FormData(this);
+                $.ajax({
+                    type: "put",
+                    url: "/manage",
+                    data: formData,
+                    contentType: false,
+                    processData: false,
+                    success: function (data) {
+                        if (data.redirect) window.location.href = data.redirect;
+                        else {
+                            // make sure data consistent
+                            var values = {
+                                username: data.record.username,
+                                password: data.record.password,
+                                email: data.record.email,
+                                birthday: data.record.birthday,
+                                gender: data.record.gender,
+                                role: data.record.role,
+                                DT_RowId: data.record.DT_RowId
+                            }
+                            var row = table.row('#' + values.DT_RowId);
+                            table.one('draw', function () {
+                                var $row = $(table.row('#' + values.DT_RowId).select().node());
+                                if ($row.offset().top > 0)
+                                    $('html, body').animate({
+                                        scrollTop: ($row.offset().top - 120)
+                                    }, 500);
+                                $.notify('Successfully Submitted');
+                            });
+                            if (row.length === 0) {
+                                table.row.add(values).draw(false);
+                            } else {
+                                row.data(values).draw(false);
+                            }
+                        }
+                    }
+                });
+            });
+            var update_size = function () {
+                var $table = $('#usertable');
+                $table.css('width', $table.parent().width());
+                table.fixedHeader.adjust();
+            }
+            $(window).resize(function () {
+                clearTimeout(window.refresh_size);
+                window.refresh_size = setTimeout(function () {
+                    update_size();
+                }, 250);
+            });
+        });
+
+

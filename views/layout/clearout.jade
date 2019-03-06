@@ -1,0 +1,17 @@
+doctype html
+html(lang='en')
+    head
+        include ../partials/head
+        block styles
+    body.theme-bg-dark
+        #wrapper
+            nav.navbar.navbar-expand-lg.navbar-dark.bg-dark.ftco-navbar-light.scrolled.awake.adjusted-nav#ftco-navbar
+                include ../partials/header
+            include ../partials/sidebar
+            #page-wrapper
+                block view
+                footer.ftco-footer.ftco-section.ftco-bg-light
+                    .row
+                        .col-md-12.text-center
+        include ../partials/scripts
+        block scripts

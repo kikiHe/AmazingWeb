@@ -1,0 +1,19 @@
+extends layout/default
+
+block view
+    include page_partials/page_banner
+    include page_partials/chef
+    .ftco-section
+        .container
+            .row.justify-content-center.mb-5.pb-5
+                .col-md-7.text-center.heading-section.ftco-animate
+                    span.subheading Our Chef
+                    h2 Our Master Chef
+            .row
+                each item in inits.chef
+                    .col-md-4.ftco-animate
+                        .block-10
+                            .person-info
+                                span.name=item.name
+                                span.position=item.position
+                            .chef-img(style='background-image: url(' + item.image + ')')

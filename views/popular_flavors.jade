@@ -1,0 +1,93 @@
+extends layout/clearout
+
+block view
+    .container-fluid
+        .row
+            .col-12.connectedSortable
+                section.ftco-animate
+                    .row
+                        .box.reserve-chart.col-12
+                            .box-header.with-border
+                                h3.box-title The Top 10 Most Popular Flavors
+                                .box-tools.pull-right
+                                    button.btn.btn-box-tool(type='button', data-widget='collapse')
+                                        i.fa.fa-minus
+                                    button.btn.btn-box-tool(type='button', data-widget='remove')
+                                        i.fa.fa-times
+                            .box-body.ftco-animate.fadeInUp.ftco-animated
+                                .row(style="height: 480px;")
+                                    .col-6
+                                        #popular-flavors
+                                    .col-6
+                                        #popular-pie
+                                            
+block scripts
+    script.
+        $(function () {
+            $('#popular-flavors').ready(function () {
+                $('#popular-flavors').empty().append($('<div class="chartjs-chart"><canvas id="popular-chart" class="chartjs-canvas" height="450"></canvas></div>'));
+                var ctx = document.getElementById("popular-chart");
+                new Chart(ctx, {
+                    type: 'horizontalBar',
+                    data: {
+                        labels: ["Burgers", "Chinese", "Japanese", "Mexican", "Indian", "Korean", "Thai", "French", "Italian", "Greek"],
+                        datasets: [{
+                            label: '# of Dishes',
+                            data: [5424, 3798, 3210, 2718, 1988, 1329, 1123, 976, 612, 389],
+                            backgroundColor: 'rgba(60,141,188,0.8)',
+                            borderColor: 'rgba(60,141,188,1)',
+                            borderWidth: 1,
+                            barWidth: 10
+                        }]
+                    },
+                    options: {
+                        legend: {
+                            display: true
+                        },
+                        scales: {
+                            yAxes: [{
+                                display: true
+                            }],
+                            xAxes: [{
+                                ticks: {
+                                    beginAtZero: true
+                                }
+                            }]
+                        },
+                        xAxes: [{
+                            categoryPercentage: 1.0,
+                            barPercentage: 1.0
+                        }]
+                    }
+                });
+            })
+            $('#popular-pie').ready(function () {
+                $('#popular-pie').empty().append($('<div class="chartjs-chart"><canvas id="popular-pie-chart" class="chartjs-canvas" height="400"></canvas></div>'));
+                var ctx = document.getElementById("popular-pie-chart");
+                new Chart(ctx, {
+                    type: 'doughnut',
+                    data: {
+                        labels: ["Burgers", "Chinese", "Japanese", "Mexican", "Indian", 'Others'],
+                        datasets: [{
+                            label: 'Percentage',
+                            data: [25.03, 17.53, 14.82, 12.54, 9.18, 20.9],
+                            backgroundColor: [
+                                '#3c8dbc',
+                                '#f39c3f',
+                                '#ef6853',
+                                '#4ba75b',
+                                '#4dc0ef',
+                                '#a7a7a7'
+                            ],
+                            borderWidth: 1
+                        }]
+                    },
+                    options: {
+                        legend: {
+                            display: true
+                        },
+                        cutoutPercentage: 40
+                    }
+                });
+            })
+        });

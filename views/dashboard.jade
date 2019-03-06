@@ -1,0 +1,507 @@
+extends layout/clearout
+
+block view
+    .container-fluid
+        .row
+            .col-lg-6.connectedSortable
+                section.ftco-animate
+                    .nav-tabs-custom.menu-chart
+                        ul.nav.nav-tabs.pull-right
+                            li
+                                a(href='#drink-chart', data-toggle='tab') drink
+                            li
+                                a(href='#dessert-chart', data-toggle='tab') Dessert
+                            li.active
+                                a(href='#main-chart', data-toggle='tab') Main
+                            li.pull-left.header
+                                i.fa.fa-inbox
+                                | Menu Sales
+                        .tab-content.no-padding.ftco-animate.fadeIn.ftco-animated
+                            #main-chart.tab-pane.active
+                                .scroll-box
+                                    table.table.table-condensed
+                                        tbody
+                            #dessert-chart.tab-pane
+                                .scroll-box
+                                    table.table.table-condensed
+                                        tbody
+                            #drink-chart.tab-pane
+                                .scroll-box
+                                    table.table.table-condensed
+                                        tbody
+                section.ftco-animate
+                    .box.comment-chart
+                        .box-header.with-border
+                            h3.box-title Feedback Report (Recent 1 Month)
+                            .box-tools.pull-right
+                                button#feedback-refresh.btn.btn-box-tool(type='button')
+                                    i.fa.fa-refresh
+                                button.btn.btn-box-tool(type='button', data-widget='collapse')
+                                    i.fa.fa-minus
+                                button.btn.btn-box-tool(type='button', data-widget='remove')
+                                    i.fa.fa-times
+                        .box-body.ftco-animate.fadeInUp.ftco-animated
+                            .row
+                                .col-lg-6.px-0
+                                    .row
+                                        .col-8.px-0
+                                            #total-stat-morris(style='height:200px;')
+                                        .col-4.px-0.d-flex.align-items-center.clearfix
+                                            #total-stat-label
+                                                ul.chart-legend.clearfix
+                                    .row
+                                        .col-12.text-center
+                                            span.morris-description Ratio of Comment Category
+                                .col-lg-6
+                                    .row
+                                        .col-12
+                                            #type-stat-chart(style='max-height:230px;')
+            .col-lg-6.connectedSortable
+                section.ftco-animate
+                    .box.sales-chart
+                        .box-header.with-border
+                            h3.box-title Total Sales Report (Recent Two Years)
+                            .box-tools.pull-right
+                                button#sales-refresh.btn.btn-box-tool(type='button')
+                                    i.fa.fa-refresh
+                                button.btn.btn-box-tool(type='button', data-widget='collapse')
+                                    i.fa.fa-minus
+                                button.btn.btn-box-tool(type='button', data-widget='remove')
+                                    i.fa.fa-times
+                        .box-body.ftco-animate.fadeInUp.ftco-animated
+                            .chartjs-chart
+                                canvas#sales-chart.chartjs-canvas(height=180)
+                        .box-footer.ftco-animate.fadeInUp.ftco-animated
+                            .row
+                                .col-sm-3.col-xs-6.footer-block
+                                    #revenue-box.description-block.border-right
+                                .col-sm-3.col-xs-6.footer-block
+                                    #cost-box.description-block.border-right
+                                .col-sm-3.col-xs-6.footer-block
+                                    #profit-box.description-block.border-right
+                                .col-sm-3.col-xs-6.footer-block
+                                    #complete-box.description-block
+                section.ftco-animate
+                    .box.reserve-chart
+                        .box-header.with-border
+                            h3.box-title Reservation Report (Recent 1 Month)
+                            .box-tools.pull-right
+                                button#reserve-refresh.btn.btn-box-tool(type='button')
+                                    i.fa.fa-refresh
+                                button.btn.btn-box-tool(type='button', data-widget='collapse')
+                                    i.fa.fa-minus
+                                button.btn.btn-box-tool(type='button', data-widget='remove')
+                                    i.fa.fa-times
+                        .box-body.ftco-animate.fadeInUp.ftco-animated
+                            #reserve-info-chart
+block scripts
+    script.
+        $(function () {
+            $('.nav-tabs-custom > ul > li').click(function () {
+                $('.nav-tabs-custom > ul > li').removeClass('active');
+                $(this).addClass('active');
+            });
+            Number.prototype.format = function (n, x) {
+                var re = '\\d(?=(\\d{' + (x || 3) + '})+' + (n > 0 ? '\\.' : '$') + ')';
+                return this.toFixed(Math.max(0, ~~n)).replace(new RegExp(re, 'g'), '$&,');
+            };
+            $('.menu-chart .tab-content .scroll-box').slimScroll({
+                allowPageScroll: true,
+                height: '240px',
+                color: 'transparent',
+                wheelStep: 16
+            });
+            $('.menu-chart.nav-tabs-custom').append($('<div class="overlay"><div class="fa fa-refresh fa-spin"></div></div>'));
+            $.ajax({
+                url: '/menu_order_info',
+                type: 'get',
+                success: function (data) {
+                    if (data.menu_order_info) {
+                        var menus = ['main', 'dessert', 'drink']
+                        //- clear table
+                        menus.forEach(function (type) {
+                            var $tbody = $('#' + type + '-chart table tbody');
+                            $tbody.empty();
+                            $tbody.append($('<tr><th>Meal Name</th>' +
+                                '<th>Past 1 Month Sales</th><th class="text-right">Revenue</th></tr>'));
+                        });
+                        menus.forEach(function (type) {
+                            var $tbody = $('#' + type + '-chart table tbody');
+                            data.menu_order_info[type].forEach(function (meal) {
+                                var end = meal.times[meal.times.length - 1];
+                                var start = meal.times[0];
+                                var changes = 0;
+                                if ((start === 0 && end !== 0) || (start !== 0 && end === 0)) changes = 1;
+                                else if (start > end) changes = (start - end) / start;
+                                else if (start < end) changes = (end - start) / start;
+                                changes *= 100;
+                                var trend = '<span class="trend trend-down"><i class="fa fa-long-arrow-down mr-1" aria-hidden="true"></i><span class="trend-text">0 %</span></span>';
+                                if (start <= end) {
+                                    trend = '<span class="trend trend-up"><i class="fa fa-long-arrow-up mr-1" aria-hidden="true"></i><span class="trend-text">0 %</span></span>';
+                                }
+                                var new_data = $('<tr id="' + meal.name + '-tr"><td><div class="menus d-flex">' +
+                                    '<div class="menu-img" style="background-image: url(/images/' + meal.image + ')"></div>' +
+                                    '<div class="text">' + meal.name + '</div></div></td>' +
+                                    '<td><span id="' + meal.name + '-sp" class="sparkline"></span>' +
+                                    trend + '</td>' +
+                                    '<td class="text-right"><span class="price">$ 0</span></td></tr>')
+                                $tbody.append(new_data);
+                                $('.sparkline[id="' + meal.name + '-sp"]').sparkline(meal.times, {
+                                    type: 'line',
+                                    disableHiddenCheck: true,
+                                    lineColor: '#92c1dc',
+                                    fillColor: '#ebf4f9',
+                                    height: '30px',
+                                    width: '200px'
+                                });
+                                $('[id="' + meal.name + '-tr"] .trend-text', $tbody).animateNumber({
+                                    number: changes,
+                                    easing: 'easeInQuad',
+                                    numberStep: function (now, tween) {
+                                        var target = $(tween.elem);
+                                        target.text(Math.floor(now) + ' %');
+                                    }
+                                }, 1000);
+                                $('[id="' + meal.name + '-tr"] .price', $tbody).animateNumber({
+                                    number: Number(meal.revenue),
+                                    easing: 'easeInQuad',
+                                    numberStep: function (now, tween) {
+                                        var target = $(tween.elem);
+                                        target.text('$ ' + now.format(2));
+                                    }
+                                }, 1000);
+                            });
+                        });
+                        $('.menu-chart.nav-tabs-custom .overlay').remove();
+                    }
+                }
+            })
+            $('#sales-refresh').boxRefresh({
+                source: '/total_sales_info',
+                loadInContent: false,
+                onLoadDone: function (data) {
+                    if (data.total_info) {
+                        var months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
+                        var config = {
+                            type: 'line',
+                            data: {
+                                labels: months,
+                                datasets: [
+                                    {
+                                        label: '2017',
+                                        fill: false,
+                                        backgroundColor: '#ef6853',
+                                        borderColor: '#ef6853',
+                                        borderWidth: 3,
+                                        pointRadius: 0,
+                                        data: data.total_info.data.current
+                                    },
+                                    {
+                                        label: '2016',
+                                        fill: false,
+                                        backgroundColor: '#a3a3a5',
+                                        borderColor: '#a3a3a5',
+                                        borderWidth: 3,
+                                        pointRadius: 0,
+                                        data: data.total_info.data.past
+                                    },
+                                ]
+                            },
+                            options: {
+                                responsive: true,
+                                title: {
+                                    display: false,
+                                    text: data.total_info.title
+                                },
+                                tooltips: {
+                                    mode: 'index',
+                                    intersect: false,
+                                    callbacks: {
+                                        labelTextColor: function (tooltipItem, chart) {
+                                            if (tooltipItem.datasetIndex == 0) {
+                                                if (data.total_info.data.current[tooltipItem.index] > data.total_info.data.past[tooltipItem.index])
+                                                    return 'rgb(0, 166, 90)';
+                                                else return 'rgb(245, 105, 84)';
+                                            } else {
+                                                return '#fff';
+                                            }
+                                        }
+                                    }
+                                },
+                                hover: {
+                                    mode: 'index',
+                                    intersect: false
+                                },
+                                scales: {
+                                    xAxes: [{
+                                        gridLines: {
+                                            color: 'rgba(0, 0, 0, 0.2)',
+                                            display: true,
+                                            drawBorder: true,
+                                            drawOnChartArea: false,
+                                        },
+                                        scaleLabel: {
+                                            display: false
+                                        }
+                                    }],
+                                    yAxes: [{
+                                        id: 'y-axis-0',
+                                        ticks: {
+                                            min: 0,
+                                            max: 300,
+                                            stepSize: 50
+                                        },
+                                        gridLines: {
+                                            color: 'rgba(0, 0, 0, 0.2)',
+                                            display: true,
+                                            drawBorder: true,
+                                            drawOnChartArea: true
+                                        },
+                                        scaleLabel: {
+                                            display: false
+                                        }
+                                    }]
+                                }
+                            }
+                        };
+                        //- clear box body
+                        $('#box-body').empty().append($('<div class="chartjs-chart"><canvas id="sales-chart" class="chartjs-canvas" height="180"></canvas></div>'));
+                        var ctx = document.getElementById('sales-chart').getContext('2d');
+                        window.sales_chart = new Chart(ctx, config);
+                        //- clear box footer
+                        ['revenue', 'cost', 'profit', 'complete'].forEach(function (index) {
+                            $('#' + index + '-box').empty();
+                        });
+                        ['revenue', 'cost', 'profit', 'complete'].forEach(function (index) {
+                            var $box = $('#' + index + '-box');
+                            var percent, percentN = data.total_info[index + '_changes'];
+                            if (data.total_info[index + '_changes'] > 0) {
+                                percent = '<span class="description-percentage text-green"><i class="fa fa-caret-up"></i><span class="dy-percent"> 0 %</span></span>';
+                            } else if (data.total_info[index + '_changes'] == 0) {
+                                percent = '<span class="description-percentage text-yellow"><i class="fa fa-caret-left"></i><span class="dy-percent"> 0 %</span></span>';
+                            } else {
+                                percent = '<span class="description-percentage text-red"><i class="fa fa-caret-down"></i><span class="dy-percent"> 0 %</span></span>';
+                                percentN = -data.total_info[index + '_changes'];
+                            }
+                            var title;
+                            if (index === 'complete') {
+                                title = 'goal completions';
+                            } else {
+                                title = 'total ' + index;
+                            }
+                            var index_box = $(percent + '<h5 class="description-header">0</h5>' +
+                                '<span class="description-text">' + title + '</span>');
+                            $box.append(index_box);
+                            $('.dy-percent', $box).animateNumber({
+                                number: percentN,
+                                easing: 'easeInQuad',
+                                numberStep: function (now, tween) {
+                                    var target = $(tween.elem);
+                                    target.text(' ' + Math.ceil(now) + ' %');
+                                }
+                            }, 1500);
+                            $('.description-header', $box).animateNumber({
+                                number: Number(data.total_info[index]),
+                                easing: 'easeInQuad',
+                                numberStep: function (now, tween) {
+                                    var target = $(tween.elem);
+                                    if (index === 'complete') {
+                                        target.text(Math.floor(now));
+                                    } else {
+                                        target.text('$ ' + now.format(2));
+                                    }
+                                }
+                            }, 1500);
+                        });
+                    }
+                }
+            });
+            $('#feedback-refresh').boxRefresh({
+                source: '/feedback_info',
+                loadInContent: false,
+                onLoadDone: function (data) {
+                    if (data.total_stat && data.type_stat) {
+                        // clear total-stat chart
+                        $('#total-stat-morris').empty();
+                        var $labels = $('#total-stat-label ul');
+                        $labels.empty();
+                        var amount = data.total_stat.reduce(function (a, i) {
+                            return a + i.count;
+                        }, 0);
+                        var colors = ['rgb(60, 141, 188)', 'rgb(243, 156, 18)', 'rgb(245, 105, 84)', 'rgb(0, 166, 90)', 'rgb(0, 192, 239)'];
+                        new Morris.Donut({
+                            element: 'total-stat-morris',
+                            resize: true,
+                            data: data.total_stat.map(function (feedback) {
+                                var label;
+                                if (feedback.type === 'inside environment') label = 'inside';
+                                else label = feedback.type;
+                                return {
+                                    label: label,
+                                    value: feedback.count / amount * 100
+                                }
+                            }),
+                            colors: colors,
+                            formatter: function (y) {
+                                return y.toFixed(0) + "%"
+                            }
+                        });
+                        for (var i = 0; i < data.total_stat.length; i++) {
+                            var label;
+                            if (data.total_stat[i].type === 'inside environment') label = 'inside';
+                            else label = data.total_stat[i].type;
+                            $labels.append($('<li class="ftco-animate fadeIn ftco-animated" style="color:#333"><i class="fa fa-circle-o mr-1" style="color:' + colors[i] + ';"></i>' + label + '</li>'));
+                        }
+                        // clear type_stat chart
+                        $('#type-stat-chart').empty().append('<canvas id="feedback-chart" class="chartjs-canvas" style="max-height:230px;height:230px;width:220px;max-width:250px;margin:auto"></canvas>');
+                        var labels = data.total_stat.map(function (i) {
+                            var label;
+                            if (i.type === 'inside environment') label = 'inside';
+                            else label = i.type;
+                            return label;
+                        });
+                        var config =
+                            {
+                                type: 'bar',
+                                data: {
+                                    labels: labels,
+                                    datasets: [
+                                        {
+                                            label: 'Positive',
+                                            backgroundColor: 'rgba(0, 166, 90, 0.8)',
+                                            data: data.type_stat.filter(function (i) {
+                                                return i.tag === 1;
+                                            }).map(function (i) {
+                                                return i.count;
+                                            })
+                                        }, {
+                                            label: 'Negative',
+                                            backgroundColor: 'rgba(245, 105, 84, 0.8)',
+                                            data: data.type_stat.filter(function (i) {
+                                                return i.tag === 0;
+                                            }).map(function (i) {
+                                                return -i.count;
+                                            })
+                                        }]
+                                },
+                                options: {
+                                    title: {
+                                        display: false,
+                                        text: 'Comments: Recent 1 Month'
+                                    },
+                                    tooltips: {
+                                        mode: 'index',
+                                        intersect: false
+                                    },
+                                    responsive: true,
+                                    scales: {
+                                        xAxes: [{
+                                            gridLines: {
+                                                color: 'rgba(0, 0, 0, 0.2)',
+                                                display: true,
+                                                drawBorder: true,
+                                                drawOnChartArea: false
+                                            },
+                                            ticks: {
+                                                autoSkip: false
+                                            },
+                                            stacked: true
+                                        }],
+                                        yAxes: [{
+                                            gridLines: {
+                                                color: 'rgba(0, 0, 0, 0.2)'
+                                            },
+                                            stacked: true
+                                        }]
+                                    }
+                                }
+                            };
+                        var ctx = document.getElementById('feedback-chart').getContext('2d');
+                        window.feedback_chart = new Chart(ctx, config);
+                    }
+                }
+            });
+            $('#reserve-refresh').boxRefresh({
+                source: '/reservation_info',
+                loadInContent: false,
+                onLoadDone: function (data) {
+                    if (data.reserve_info) {
+                        // clear treserve chart
+                        $('#reserve-info-chart').empty().append('<canvas id="reserve-chart" class="chartjs-canvas" style="height:200px;"></canvas>');
+                        var labels = ['10 AM', '11 AM', '12 AM', '1 PM', '2 PM', '3 PM', '4 PM', '5 PM', '6 PM', '7 PM', '8 PM', '9 PM'];
+                        var config = {
+                            type: 'bar',
+                            data: {
+                                labels: labels,
+                                datasets: [
+                                    {
+                                        label: '1 People',
+                                        backgroundColor: '#d2d6de',
+                                        data: data.reserve_info[1].map(function (i) {
+                                            return i.count
+                                        })
+                                    }, {
+                                        label: '2 People',
+                                        backgroundColor: '#00c0ef',
+                                        data: data.reserve_info[2].map(function (i) {
+                                            return i.count
+                                        })
+                                    }, {
+                                        label: '3 People',
+                                        backgroundColor: '#3c8dbc',
+                                        data: data.reserve_info[3].map(function (i) {
+                                            return i.count
+                                        })
+                                    }, {
+                                        label: '4 People',
+                                        backgroundColor: '#f39c12',
+                                        data: data.reserve_info[4].map(function (i) {
+                                            return i.count
+                                        })
+                                    }]
+                            },
+                            options: {
+                                title: {
+                                    display: false,
+                                    text: 'Reservation: Recent 1 Month'
+                                },
+                                tooltips: {
+                                    mode: 'index',
+                                    intersect: false
+                                },
+                                responsive: true,
+                                scales: {
+                                    xAxes: [{
+                                        gridLines: {
+                                            color: 'rgba(0, 0, 0, 0.2)',
+                                            display: true,
+                                            drawBorder: true,
+                                            drawOnChartArea: false
+                                        },
+                                        ticks: {
+                                            autoSkip: false
+                                        },
+                                        stacked: true
+                                    }],
+                                    yAxes: [{
+                                        gridLines: {
+                                            color: 'rgba(0, 0, 0, 0.2)'
+                                        },
+                                        stacked: true,
+                                        scaleLabel: {
+                                            labelString: 'Reservation Times',
+                                            display: true
+                                        }
+                                    }]
+                                }
+                            }
+                        };
+                        var ctx = document.getElementById('reserve-chart').getContext('2d');
+                        window.reserve_chart = new Chart(ctx, config);
+                    }
+                }
+            });
+        });
+
+
+
